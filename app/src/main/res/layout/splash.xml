@@ -12,5 +12,5 @@
         android:layout_gravity="center"
         android:layout_height="120dp"
         android:layout_weight="1"
-        app:srcCompat="@drawable/logo3" />
+        android:src="@drawable/logo3" />
 </LinearLayout>
