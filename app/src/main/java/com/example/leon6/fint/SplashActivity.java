@@ -18,7 +18,7 @@ public class SplashActivity extends Activity {
             public void run() {
                 finish();       // 3 초후 이미지를 닫아버림
             }
-        }, 1000);
+        }, 2000);
 
 
     }

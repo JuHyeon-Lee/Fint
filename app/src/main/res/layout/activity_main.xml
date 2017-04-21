@@ -5,7 +5,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#85af4b"
+    android:background="#c885af4b"
     tools:context="com.example.leon6.fint.MainActivity">
 
     <com.kakao.usermgmt.LoginButton
@@ -14,7 +14,7 @@
         android:layout_height="60dp"
         android:layout_marginLeft="80dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
