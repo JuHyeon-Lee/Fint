@@ -1,7 +1,9 @@
 package com.example.leon6.fint;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +22,13 @@ import com.kakao.usermgmt.callback.MeResponseCallback;
 import com.kakao.usermgmt.callback.UnLinkResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
 import com.kakao.util.helper.log.Logger;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 
 
 public class SuccessActivity extends AppCompatActivity {
@@ -73,6 +82,8 @@ public class SuccessActivity extends AppCompatActivity {
 
         TextView ema = (TextView) findViewById(R.id.email);
         ema.setText(email);
+
+        insertToDatabase(Long.toString(userID), nickName, email);
 
     }
 
@@ -182,6 +193,66 @@ public class SuccessActivity extends AppCompatActivity {
                             }
                         }).show();
 
+    }
+
+    private void insertToDatabase(String id, String nickName, String email){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+                    String id = (String)params[0];
+                    String nickName = (String)params[1];
+                    String email = (String)params[2];
+
+                    String link="http://leon6095.phps.kr/putdata.php";
+                    String data  = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
+                    data += "&" + URLEncoder.encode("nickname", "UTF-8") + "=" + URLEncoder.encode(nickName, "UTF-8");
+                    data += "&" + URLEncoder.encode("email", "UTF-8") + "=" + URLEncoder.encode(email, "UTF-8");
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute(id,nickName,email);
     }
 
 }
