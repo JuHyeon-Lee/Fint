@@ -37,6 +37,8 @@ public class SuccessActivity extends AppCompatActivity {
     String nickName="";
     String email="";
 
+    Intent intent = new Intent(this, MapActivity.class);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,14 @@ public class SuccessActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onClickUnlink();
+            }
+        });
+
+        Button gotomap = (Button) findViewById(R.id.gotomap);
+        gotomap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intent);
             }
         });
     }

@@ -5,8 +5,8 @@ import android.app.Application;
 
 import com.kakao.auth.KakaoSDK;
 
-public class GloabalApplication extends Application {
-    private static volatile GloabalApplication obj = null;
+public class GlobalApplication extends Application {
+    private static volatile GlobalApplication obj = null;
     private static volatile Activity currentActivity = null;
 
     @Override
@@ -16,7 +16,7 @@ public class GloabalApplication extends Application {
         KakaoSDK.init(new KakaoSDKAdapter());
     }
 
-    public static GloabalApplication getGlobalApplicationContext() {
+    public static GlobalApplication getGlobalApplicationContext() {
         return obj;
     }
 
@@ -26,6 +26,6 @@ public class GloabalApplication extends Application {
 
     // Activity가 올라올때마다 Activity의 onCreate에서 호출해줘야한다.
     public static void setCurrentActivity(Activity currentActivity) {
-        GloabalApplication.currentActivity = currentActivity;
+        GlobalApplication.currentActivity = currentActivity;
     }
 }

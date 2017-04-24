@@ -5,8 +5,8 @@
     android:background="#c885af4b"
     android:gravity="center">
 
-    <TextView
-        android:id="@+id/textView5"
+    <Button
+        android:id="@+id/gotomap"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:gravity="center"
