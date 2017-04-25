@@ -1,11 +1,16 @@
 package com.example.leon6.fint;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +41,10 @@ public class SuccessActivity extends AppCompatActivity {
     String nickName="";
     String email="";
 
+    ViewPager vp;
+
+    Button gotomap;
+
     private SessionCallback callback;
 
     @Override
@@ -45,7 +54,31 @@ public class SuccessActivity extends AppCompatActivity {
 
         startActivity(new Intent(this,SplashActivity.class));
 
-        Button gotomap = (Button) findViewById(R.id.gotomap);
+        vp = (ViewPager)findViewById(R.id.vp);
+        vp.setAdapter(new pagerAdapter(getSupportFragmentManager()));
+        vp.setCurrentItem(0);
+        vp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position==2)
+                    gotomap.setVisibility(View.VISIBLE);
+                else
+                    gotomap.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        gotomap = (Button) findViewById(R.id.gotomap);
+        gotomap.setVisibility(View.INVISIBLE);
         gotomap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +87,7 @@ public class SuccessActivity extends AppCompatActivity {
                 Session.getCurrentSession().checkAndImplicitOpen();
             }
         });
+
     }
 
     @Override
@@ -75,9 +109,6 @@ public class SuccessActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("userID", Long.toString(userID));
         editor.commit();
-
-
-
 
     }
 
@@ -223,6 +254,36 @@ public class SuccessActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private class pagerAdapter extends FragmentStatePagerAdapter
+    {
+        public pagerAdapter(android.support.v4.app.FragmentManager fm)
+        {
+            super(fm);
+        }
+        @Override
+        public android.support.v4.app.Fragment getItem(int position)
+        {
+            switch(position)
+            {
+                case 0:
+                    return new ViewpagerFragment1();
+                case 1:
+                    return new ViewpagerFragment2();
+                case 2:
+                    return new ViewpagerFragment3();
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public int getCount()
+        {
+            return 3;
+        }
+    }
+
 
     // 로그아웃 및 탈퇴하기
 //    private void onClickLogout() {

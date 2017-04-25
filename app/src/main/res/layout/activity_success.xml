@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#c885af4b"
-    android:gravity="center">
+    android:background="#3285af4b"
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/gotomap"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Map" />
+        android:orientation="vertical">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+        </android.support.v4.view.ViewPager>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/gotomap"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:background="#85af4b"
+                android:gravity="center"
+                android:text="시작하기"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="85dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_gravity="right"
+                android:background="@drawable/next2" />
+        </FrameLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>
