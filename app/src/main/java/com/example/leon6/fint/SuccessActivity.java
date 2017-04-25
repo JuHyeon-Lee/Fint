@@ -1,10 +1,8 @@
 package com.example.leon6.fint;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,15 +10,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
 import com.kakao.kakaotalk.KakaoTalkService;
 import com.kakao.kakaotalk.callback.TalkResponseCallback;
 import com.kakao.kakaotalk.response.KakaoTalkProfile;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
-import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.kakao.usermgmt.callback.MeResponseCallback;
-import com.kakao.usermgmt.callback.UnLinkResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
+import com.kakao.util.exception.KakaoException;
 import com.kakao.util.helper.log.Logger;
 
 import java.io.BufferedReader;
@@ -37,7 +36,7 @@ public class SuccessActivity extends AppCompatActivity {
     String nickName="";
     String email="";
 
-    Intent intent = new Intent(this, MapActivity.class);
+    private SessionCallback callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,27 +45,13 @@ public class SuccessActivity extends AppCompatActivity {
 
         startActivity(new Intent(this,SplashActivity.class));
 
-        Button logout = (Button) findViewById(R.id.logout);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickLogout();
-            }
-        });
-
-        Button unlink = (Button) findViewById(R.id.unlink);
-        unlink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickUnlink();
-            }
-        });
-
         Button gotomap = (Button) findViewById(R.id.gotomap);
         gotomap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(intent);
+                callback = new SuccessActivity.SessionCallback();
+                Session.getCurrentSession().addCallback(callback);
+                Session.getCurrentSession().checkAndImplicitOpen();
             }
         });
     }
@@ -84,19 +69,19 @@ public class SuccessActivity extends AppCompatActivity {
 
         requestMe();
 
-        TextView id = (TextView) findViewById(R.id.userID);
-        id.setText(Long.toString(userID));
-
-        TextView nn = (TextView) findViewById(R.id.nickname);
-        nn.setText(nickName);
-
-        TextView ema = (TextView) findViewById(R.id.email);
-        ema.setText(email);
-
         insertToDatabase(Long.toString(userID), nickName, email);
+
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("userID", Long.toString(userID));
+        editor.commit();
+
+
+
 
     }
 
+    // 프로필 요청
     public void requestMe() {
         UserManagement.requestMe(new MeResponseCallback() {
             @Override
@@ -125,6 +110,7 @@ public class SuccessActivity extends AppCompatActivity {
         });
     }
 
+    // 연결 해제 시
     private void redirectLoginActivity() {
         final Intent intent = new Intent(this, MainActivity.class);
         Toast.makeText(getApplicationContext(), "로그인 창으로 돌아갑니다.", Toast.LENGTH_SHORT).show();
@@ -133,6 +119,7 @@ public class SuccessActivity extends AppCompatActivity {
         finish();
     }
 
+    // 로그인 판단
     private abstract class KakaoTalkResponseCallback<T> extends TalkResponseCallback<T> {
         @Override
         public void onNotKakaoTalkUser() {
@@ -155,56 +142,7 @@ public class SuccessActivity extends AppCompatActivity {
         }
     }
 
-    private void onClickLogout() {
-        UserManagement.requestLogout(new LogoutResponseCallback() {
-            @Override
-            public void onCompleteLogout() {
-                requestMe();
-            }
-        });
-    }
-
-    private void onClickUnlink() {
-        final String appendMessage = getString(R.string.com_kakao_confirm_unlink);
-        new AlertDialog.Builder(this)
-                .setMessage(appendMessage)
-                .setPositiveButton(getString(R.string.com_kakao_ok_button),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                UserManagement.requestUnlink(new UnLinkResponseCallback() {
-                                    @Override
-                                    public void onFailure(ErrorResult errorResult) {
-                                        Logger.e(errorResult.toString());
-                                    }
-
-                                    @Override
-                                    public void onSessionClosed(ErrorResult errorResult) {
-                                        requestMe();
-                                    }
-
-                                    @Override
-                                    public void onNotSignedUp() {
-                                    }
-
-                                    @Override
-                                    public void onSuccess(Long userId) {
-                                        requestMe();
-                                    }
-                                });
-                                dialog.dismiss();
-                            }
-                        })
-                .setNegativeButton(getString(R.string.com_kakao_cancel_button),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-
-    }
-
+    // DB에 회원정보 저장
     private void insertToDatabase(String id, String nickName, String email){
 
         class InsertData extends AsyncTask<String, Void, String> {
@@ -264,5 +202,77 @@ public class SuccessActivity extends AppCompatActivity {
         InsertData task = new InsertData();
         task.execute(id,nickName,email);
     }
+
+    // 액티비티 전환 시 필요
+    private class SessionCallback implements ISessionCallback {
+
+        @Override
+        public void onSessionOpened() {
+            gotomap();
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException exception) {
+            if(exception != null) {
+                Logger.e(exception);
+            }
+        }
+    }
+    public void gotomap(){
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    // 로그아웃 및 탈퇴하기
+//    private void onClickLogout() {
+//        UserManagement.requestLogout(new LogoutResponseCallback() {
+//            @Override
+//            public void onCompleteLogout() {
+//                requestMe();
+//            }
+//        });
+//    }
+//
+//    private void onClickUnlink() {
+//        final String appendMessage = getString(R.string.com_kakao_confirm_unlink);
+//        new AlertDialog.Builder(this)
+//                .setMessage(appendMessage)
+//                .setPositiveButton(getString(R.string.com_kakao_ok_button),
+//                        new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                UserManagement.requestUnlink(new UnLinkResponseCallback() {
+//                                    @Override
+//                                    public void onFailure(ErrorResult errorResult) {
+//                                        Logger.e(errorResult.toString());
+//                                    }
+//
+//                                    @Override
+//                                    public void onSessionClosed(ErrorResult errorResult) {
+//                                        requestMe();
+//                                    }
+//
+//                                    @Override
+//                                    public void onNotSignedUp() {
+//                                    }
+//
+//                                    @Override
+//                                    public void onSuccess(Long userId) {
+//                                        requestMe();
+//                                    }
+//                                });
+//                                dialog.dismiss();
+//                            }
+//                        })
+//                .setNegativeButton(getString(R.string.com_kakao_cancel_button),
+//                        new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                dialog.dismiss();
+//                            }
+//                        }).show();
+//
+//    }
 
 }

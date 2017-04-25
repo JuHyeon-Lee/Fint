@@ -10,6 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment"
-        tools:layout="@layout/activity_map" />
+        tools:layout="@layout/preview_image" />
 
 </LinearLayout>
