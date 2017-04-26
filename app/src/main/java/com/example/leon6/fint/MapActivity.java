@@ -111,6 +111,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     }
 
     public void permission(){
-
+        
     }
 }
