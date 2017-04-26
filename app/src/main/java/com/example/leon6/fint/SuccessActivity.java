@@ -79,12 +79,28 @@ public class SuccessActivity extends AppCompatActivity {
 
         gotomap = (Button) findViewById(R.id.gotomap);
         gotomap.setVisibility(View.INVISIBLE);
+        gotomap.bringToFront();
         gotomap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 callback = new SuccessActivity.SessionCallback();
                 Session.getCurrentSession().addCallback(callback);
                 Session.getCurrentSession().checkAndImplicitOpen();
+            }
+        });
+
+        Button nextpage = (Button) findViewById(R.id.nextpage);
+        nextpage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int next = vp.getCurrentItem();
+
+                if(next==0||next==1)
+                    next++;
+                else;
+
+                vp.setCurrentItem(next);
             }
         });
 

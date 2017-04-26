@@ -3,6 +3,8 @@
     package="com.example.leon6.fint">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".GlobalApplication"
@@ -25,6 +27,8 @@
         <activity android:name=".SplashActivity"></activity>
 
         <activity android:name=".MapActivity"></activity>
+
+        <activity android:name=".MissionListActivity"></activity>
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
