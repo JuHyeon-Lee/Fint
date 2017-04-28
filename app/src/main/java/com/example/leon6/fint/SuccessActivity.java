@@ -1,6 +1,5 @@
 package com.example.leon6.fint;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,11 +7,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kakao.auth.ISessionCallback;
@@ -52,7 +48,13 @@ public class SuccessActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_success);
 
-        startActivity(new Intent(this,SplashActivity.class));
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        Boolean tut = pref.getBoolean("tutorial", false);
+        if(tut==true){
+            callback = new SuccessActivity.SessionCallback();
+            Session.getCurrentSession().addCallback(callback);
+            Session.getCurrentSession().checkAndImplicitOpen();
+        }
 
         vp = (ViewPager)findViewById(R.id.vp);
         vp.setAdapter(new pagerAdapter(getSupportFragmentManager()));
@@ -266,12 +268,19 @@ public class SuccessActivity extends AppCompatActivity {
         }
     }
     public void gotomap(){
+
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean("tutorial", true);
+        editor.commit();
+
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
         finish();
     }
 
     private class pagerAdapter extends FragmentStatePagerAdapter
+
     {
         public pagerAdapter(android.support.v4.app.FragmentManager fm)
         {
