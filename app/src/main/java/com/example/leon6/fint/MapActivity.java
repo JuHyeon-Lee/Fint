@@ -56,6 +56,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     }
 
+    // 맵 불러오기 완료
     @Override
     public void onMapReady(GoogleMap map) {
 
@@ -90,11 +91,11 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         });
     }
 
+    // 어플리케이션 종료
     @Override
     public void onBackPressed() {
         DialogView();
     }
-
     private void DialogView(){
         AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
         alert_confirm.setMessage("종료하시겠습니까?").setCancelable(false).setPositiveButton("네",
@@ -137,6 +138,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         finish();
     }
 
+    // 위치정보 권한 얻기
     public void permission(){
         /* 사용자의 OS 버전이 마시멜로우 이상인지 체크한다. */
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
@@ -201,7 +203,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 1000) {
