@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kakao.auth.ISessionCallback;
@@ -32,27 +33,28 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     private SessionCallback callback;
 
     GoogleMap mMap;
+    UiSettings uiSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        callback = new SessionCallback();
+        Session.getCurrentSession().addCallback(callback);
+
         FragmentManager fragmentManager = getFragmentManager();
-        MapFragment mapFragment = (MapFragment)fragmentManager
-                .findFragmentById(R.id.map);
+        MapFragment mapFragment = (MapFragment)fragmentManager.findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
 
         Button gotolist = (Button) findViewById(R.id.gotolist);
         gotolist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback = new SessionCallback();
-                Session.getCurrentSession().addCallback(callback);
+
                 Session.getCurrentSession().checkAndImplicitOpen();
             }
         });
-
 
     }
 
@@ -70,6 +72,10 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         map.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         map.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+        uiSettings = map.getUiSettings();
+        uiSettings.setTiltGesturesEnabled(false);
+        uiSettings.setRotateGesturesEnabled(false);
 
         mMap=map;
 
@@ -135,7 +141,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     public void gotomap(){
         Intent intent = new Intent(this, MissionListActivity.class);
         startActivity(intent);
-        finish();
     }
 
     // 위치정보 권한 얻기
@@ -224,4 +229,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         }
     }
+
+
 }
