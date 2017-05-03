@@ -6,11 +6,14 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -35,6 +38,14 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     GoogleMap mMap;
     UiSettings uiSettings;
 
+    double longitude;
+    double latitude;
+    double altitude;
+    float accuracy;
+    String provider;
+
+    LatLng HERE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +55,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         Session.getCurrentSession().addCallback(callback);
 
         FragmentManager fragmentManager = getFragmentManager();
-        MapFragment mapFragment = (MapFragment)fragmentManager.findFragmentById(R.id.mapView);
+        MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
 
         Button gotolist = (Button) findViewById(R.id.gotolist);
@@ -71,26 +82,43 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         map.addMarker(markerOptions);
 
         map.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
-        map.animateCamera(CameraUpdateFactory.zoomTo(15));
+        map.animateCamera(CameraUpdateFactory.zoomTo(10));
 
         uiSettings = map.getUiSettings();
         uiSettings.setTiltGesturesEnabled(false);
         uiSettings.setRotateGesturesEnabled(false);
 
-        mMap=map;
+        mMap = map;
 
         permission();
+
+        final LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+
+        }
+        else{
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, // 등록할 위치제공자
+                    100, // 통지사이의 최소 시간간격 (miliSecond)
+                    1, // 통지사이의 최소 변경거리 (m)
+                    mLocationListener);
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자
+                    100, // 통지사이의 최소 시간간격 (miliSecond)
+                    1, // 통지사이의 최소 변경거리 (m)
+                    mLocationListener);
+
+
+        }
 
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                LocationManager locationManager = (LocationManager)getSystemService( LOCATION_SERVICE );
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 // GPS 활성화 체크, 활성화 - return true
-                if( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER)) {
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
-                    Toast.makeText(getApplicationContext(),"GPS를 켜주세요.",Toast.LENGTH_SHORT).show();
-                    Intent gpsOptionsIntent = new Intent( android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS );
-                    startActivity( gpsOptionsIntent );
+                    Toast.makeText(getApplicationContext(), "GPS를 켜주세요.", Toast.LENGTH_SHORT).show();
+                    Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(gpsOptionsIntent);
                 }
                 return false;
             }
@@ -102,7 +130,8 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     public void onBackPressed() {
         DialogView();
     }
-    private void DialogView(){
+
+    private void DialogView() {
         AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
         alert_confirm.setMessage("종료하시겠습니까?").setCancelable(false).setPositiveButton("네",
                 new DialogInterface.OnClickListener() {
@@ -133,18 +162,19 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
-            if(exception != null) {
+            if (exception != null) {
                 Logger.e(exception);
             }
         }
     }
-    public void gotomap(){
+
+    public void gotomap() {
         Intent intent = new Intent(this, MissionListActivity.class);
         startActivity(intent);
     }
 
     // 위치정보 권한 얻기
-    public void permission(){
+    public void permission() {
         /* 사용자의 OS 버전이 마시멜로우 이상인지 체크한다. */
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
 
@@ -220,8 +250,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                 }
-            }
-            else {
+            } else {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 permission();
@@ -230,5 +259,41 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         }
     }
 
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            //여기서 위치값이 갱신되면 이벤트가 발생한다.
+            //값은 Location 형태로 리턴되며 좌표 출력 방법은 다음과 같다.
+
+            Log.d("test", "onLocationChanged, location:" + location);
+            longitude = location.getLongitude(); //경도
+            latitude = location.getLatitude();   //위도
+            altitude = location.getAltitude();   //고도
+            accuracy = location.getAccuracy();    //정확도
+            provider = location.getProvider();   //위치제공자
+            //Gps 위치제공자에 의한 위치변화. 오차범위가 좁다.
+            //Network 위치제공자에 의한 위치변화
+            //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
+
+            HERE = new LatLng(latitude,longitude);
+            Toast.makeText(getApplicationContext(), latitude+"/"+longitude,Toast.LENGTH_SHORT).show();
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(HERE));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        }
+        public void onProviderDisabled(String provider) {
+            // Disabled시
+            Log.d("test", "onProviderDisabled, provider:" + provider);
+        }
+
+        public void onProviderEnabled(String provider) {
+            // Enabled시
+            Log.d("test", "onProviderEnabled, provider:" + provider);
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // 변경시
+            Log.d("test", "onStatusChanged, provider:" + provider + ", status:" + status + " ,Bundle:" + extras);
+        }
+    };
 
 }
