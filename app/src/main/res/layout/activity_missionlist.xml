@@ -4,11 +4,8 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:textSize="30sp"
-        android:text="미션 목록" />
+    <ListView
+        android:id="@+id/missionlistview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>
