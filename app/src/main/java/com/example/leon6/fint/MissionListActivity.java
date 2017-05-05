@@ -25,8 +25,6 @@ import java.util.Locale;
 
 public class MissionListActivity extends Activity{
 
-    ArrayList<MissionInfo> missioninfo = new ArrayList<MissionInfo>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

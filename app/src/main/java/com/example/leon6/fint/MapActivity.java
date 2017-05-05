@@ -24,13 +24,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.kakao.auth.ISessionCallback;
-import com.kakao.auth.Session;
-import com.kakao.util.exception.KakaoException;
-import com.kakao.util.helper.log.Logger;
 
 import java.util.ArrayList;
 
@@ -47,7 +42,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     LatLng HERE;
 
-    ArrayList<MissionInfo> missioninfo = new ArrayList<MissionInfo>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +59,15 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             public void onClick(View v) {
 
                 gotomap();
+            }
+        });
+
+        Button newmission = (Button) findViewById(R.id.newmission);
+        newmission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                newmission();
             }
         });
 
@@ -109,24 +113,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         }
 
-        map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                MarkerOptions markerOptions = new MarkerOptions();
-//                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.logo3));
-                markerOptions.position(latLng); //마커위치설정
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // 마커생성위치로 이동
-                mMap.addMarker(markerOptions); //마커 생성
-
-                MissionInfo mission = new MissionInfo();
-
-                mission.setLat(latLng.latitude);
-                mission.setLon(latLng.longitude);
-                missioninfo.add(mission);
-            }
-        });
-
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
@@ -148,7 +134,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     public void onBackPressed() {
         DialogView();
     }
-
     private void DialogView() {
         AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
         alert_confirm.setMessage("종료하시겠습니까?").setCancelable(false).setPositiveButton("네",
@@ -170,9 +155,13 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         alert.show();
     }
 
+    // 액티비티 이동
     public void gotomap() {
         Intent intent = new Intent(this, MissionListActivity.class);
-        intent.putExtra("mission", missioninfo);
+        startActivity(intent);
+    }
+    public void newmission() {
+        Intent intent = new Intent(this, NewMissionActivity.class);
         startActivity(intent);
     }
 
@@ -262,7 +251,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         }
     }
 
-
+    // 위치정보 획득
     private final LocationListener mLocationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             //여기서 위치값이 갱신되면 이벤트가 발생한다.
