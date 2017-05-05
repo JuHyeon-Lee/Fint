@@ -7,6 +7,7 @@ public class MissionInfo implements Serializable{
     double lat;
     double lon;
     String hint;
+    String id;
 
     public void setLat(double lat) {
         this.lat = lat;
@@ -20,6 +21,10 @@ public class MissionInfo implements Serializable{
         this.lon = lon;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public double getLon() {
         return lon;
     }
@@ -30,5 +35,9 @@ public class MissionInfo implements Serializable{
 
     public String getHint() {
         return hint;
+    }
+
+    public String getId() {
+        return id;
     }
 }

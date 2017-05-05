@@ -53,14 +53,14 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
 
-        Button gotolist = (Button) findViewById(R.id.gotolist);
-        gotolist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                gotomap();
-            }
-        });
+//        Button gotolist = (Button) findViewById(R.id.gotolist);
+//        gotolist.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                gotomap();
+//            }
+//        });
 
         Button newmission = (Button) findViewById(R.id.newmission);
         newmission.setOnClickListener(new View.OnClickListener() {

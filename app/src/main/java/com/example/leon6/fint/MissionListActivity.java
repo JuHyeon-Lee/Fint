@@ -73,6 +73,7 @@ public class MissionListActivity extends Activity{
             // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
             TextView missionnum = (TextView) convertView.findViewById(R.id.missionnum);
             TextView geoinfo = (TextView) convertView.findViewById(R.id.geoinfo);
+            TextView hint_text = (TextView) convertView.findViewById(R.id.hint);
 
             MissionInfo missionInfo = missioninfo.get(position);
 
@@ -81,6 +82,8 @@ public class MissionListActivity extends Activity{
 
             String add = getLocation(missionInfo.getLat(),missionInfo.getLon());
             geoinfo.setText(add);
+
+            hint_text.setText(missionInfo.getHint());
 
             return convertView;
         }
