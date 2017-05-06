@@ -8,6 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#85af4b"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -22,7 +24,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:gravity="right"
             android:layout_marginRight="5dp"
             android:orientation="horizontal">
@@ -30,12 +32,42 @@
             <Button
                 android:id="@+id/savemission"
                 android:layout_width="50dp"
-                android:layout_height="30dp"
+                android:layout_height="35dp"
                 android:background="#edeada"
                 android:text="저장"
-                android:textColor="#85af4b"
                 android:textSize="15sp" />
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#85af4b"
+        android:paddingBottom="5dp"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/searchView1"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/border"
+            android:hint=" 장소 이름으로 검색"
+            android:imeOptions="actionSearch"
+            android:inputType="textPostalAddress"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:background="#edeada"
+            android:layout_marginRight="5dp"
+            android:text="검색" />
 
     </LinearLayout>
 

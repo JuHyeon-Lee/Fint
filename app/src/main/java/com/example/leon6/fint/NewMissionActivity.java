@@ -5,10 +5,15 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,11 +26,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewMissionActivity extends Activity implements OnMapReadyCallback {
 
     GoogleMap mMap;
     UiSettings uiSettings;
+
+    double home_long;
+    double home_lat;
+    LatLng latLng;
+    String addressText;
+    MarkerOptions markerOptions;
+    EditText searchview;
+    Button button1;
 
     ArrayList<MissionInfo> missioninfo = new ArrayList<MissionInfo>();
 
@@ -43,6 +57,44 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 gotolist();
+            }
+        });
+
+        searchview = (EditText) findViewById(R.id.searchView1);
+        searchview.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                button1.performClick();
+                return true;
+            }
+        });
+
+        button1 = (Button) findViewById(R.id.button1);
+        button1.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                searchview = (EditText) findViewById(R.id.searchView1);
+                String g = searchview.getText().toString();
+
+                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchview.getWindowToken(),0);
+
+                Geocoder geocoder = new Geocoder(getBaseContext());
+                List<Address> addresses = null;
+
+                try {
+                    // Getting a maximum of 3 Address that matches the input
+                    // text
+                    addresses = geocoder.getFromLocationName(g,1);
+                    if (addresses != null && !addresses.equals(""))
+                        search(addresses);
+
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "검색결과가 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
@@ -215,5 +267,27 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
 
         AlertDialog dialog = builder.create() ;
         dialog.show() ;
+    }
+
+    protected void search(List<Address> addresses) {
+
+        Address address = (Address) addresses.get(0);
+        home_long = address.getLongitude();
+        home_lat = address.getLatitude();
+        latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+        addressText = String.format(
+                "%s, %s",
+                address.getMaxAddressLineIndex() > 0 ? address
+                        .getAddressLine(0) : "", address.getCountryName());
+
+        markerOptions = new MarkerOptions();
+
+        if(String.valueOf(latLng.latitude).equals(null)){
+
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 }
