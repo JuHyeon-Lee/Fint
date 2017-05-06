@@ -51,9 +51,31 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#85af4b"
-        android:gravity="right"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="제목 : "
+            android:textColor="#edeada"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/titleinput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:ems="10"
+            android:hint="제목을 입력하세요"
+            android:inputType="textPersonName"
+            android:textColor="#edeada"
+            android:textColorHint="#edeada"
+            android:textSize="20sp" />
     </LinearLayout>
 
 </LinearLayout>

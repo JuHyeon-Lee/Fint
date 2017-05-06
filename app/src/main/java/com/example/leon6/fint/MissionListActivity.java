@@ -2,6 +2,7 @@ package com.example.leon6.fint;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
@@ -40,6 +41,14 @@ public class MissionListActivity extends Activity{
         // 리스트뷰 참조 및 Adapter달기
         listview = (ListView) findViewById(R.id.missionlistview);
         listview.setAdapter(adapter);
+
+        TextView missiontitle = (TextView) findViewById(R.id.missiontitle);
+        TextView missionwriter = (TextView) findViewById(R.id.missionwriter);
+
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        missionwriter.setText(pref.getString("nickname", "작성자"));
+
+        missiontitle.setText(getIntent().getStringExtra("title"));
 
     }
 

@@ -116,6 +116,10 @@ public class SuccessActivity extends AppCompatActivity {
             @Override
             public void onSuccess(KakaoTalkProfile talkProfile) {
                 nickName = talkProfile.getNickName();
+                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("nickname", nickName);
+                editor.commit();
             }
         });
 

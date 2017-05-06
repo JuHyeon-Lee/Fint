@@ -268,7 +268,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
 
             HERE = new LatLng(latitude,longitude);
-            Toast.makeText(getApplicationContext(), latitude+"/"+longitude,Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), latitude+"/"+longitude,Toast.LENGTH_SHORT).show();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(HERE));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
         }

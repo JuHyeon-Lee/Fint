@@ -78,16 +78,23 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
                 markerOptions.title("힌트");
                 markerOptions.snippet("힌트 내용");
 
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // 마커생성위치로 이동
-                Marker marker = mMap.addMarker(markerOptions); //마커 생성
+                if(missioninfo.size()<5){
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // 마커생성위치로 이동
+                    Marker marker = mMap.addMarker(markerOptions); //마커 생성
 
-                MissionInfo mission = new MissionInfo();
+                    MissionInfo mission = new MissionInfo();
 
-                mission.setId(marker.getId());
-                mission.setHint("힌트 내용");
-                mission.setLat(latLng.latitude);
-                mission.setLon(latLng.longitude);
-                missioninfo.add(mission);
+                    mission.setId(marker.getId());
+                    mission.setHint("힌트 내용");
+                    mission.setLat(latLng.latitude);
+                    mission.setLon(latLng.longitude);
+                    missioninfo.add(mission);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "힌트는 최대 5개까지만 만들 수 있습니다.", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
 
@@ -130,11 +137,37 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
                 marker.hideInfoWindow();
             }
         });
+
+        map.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+            @Override
+            public void onInfoWindowLongClick(Marker marker) {
+                int pos=0;
+
+                // 어레이리스트에서 marker ID 값을 검색해서 position 반환
+                for(int i=0; i<missioninfo.size(); i++){
+                    MissionInfo ft=missioninfo.get(i);
+                    if(ft.getId().equals(marker.getId())){
+                        pos=i;
+                        break;
+                    }
+                }
+
+                deletehint(pos, marker);
+            }
+        });
     }
 
     public void gotolist(){
         Intent intent = new Intent(this, MissionListActivity.class);
         intent.putExtra("mission", missioninfo);
+
+        EditText inputtitle = (EditText) findViewById(R.id.titleinput);
+        String title = String.valueOf(inputtitle.getText());
+        if(title.equals("")){
+            title="제목 없음";
+        }
+        intent.putExtra("title", title);
+
         startActivity(intent);
         finish();
     }
@@ -166,5 +199,21 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
         });
 
         alert.show();
+    }
+
+    public void deletehint(final int pos, final Marker marker){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("삭제")
+                .setMessage("힌트를 삭제하시겠습니까?")
+                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dlg, int value) {
+                        missioninfo.remove(pos);
+                        marker.remove();
+                    }
+                })
+                .setNegativeButton("아니요", null);
+
+        AlertDialog dialog = builder.create() ;
+        dialog.show() ;
     }
 }
