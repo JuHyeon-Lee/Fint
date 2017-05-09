@@ -27,8 +27,6 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-
 public class MapActivity extends Activity implements OnMapReadyCallback {
 
     GoogleMap mMap;
@@ -157,7 +155,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     // 액티비티 이동
     public void gotomap() {
-        Intent intent = new Intent(this, MissionListActivity.class);
+        Intent intent = new Intent(this, SaveMissionActivity.class);
         startActivity(intent);
     }
     public void newmission() {

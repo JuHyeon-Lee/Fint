@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MissionListActivity extends Activity{
+public class SaveMissionActivity extends Activity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

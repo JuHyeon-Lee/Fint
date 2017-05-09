@@ -212,7 +212,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
 
     // 미션 저장
     public void gotolist(){
-        Intent intent = new Intent(this, MissionListActivity.class);
+        Intent intent = new Intent(this, SaveMissionActivity.class);
         intent.putExtra("mission", missioninfo);
 
         EditText inputtitle = (EditText) findViewById(R.id.titleinput);

@@ -28,7 +28,7 @@
 
         <activity android:name=".MapActivity"></activity>
 
-        <activity android:name=".MissionListActivity"></activity>
+        <activity android:name=".SaveMissionActivity"></activity>
 
         <activity android:name=".NewMissionActivity"></activity>
 
