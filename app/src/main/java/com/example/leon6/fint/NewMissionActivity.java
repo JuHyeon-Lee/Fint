@@ -30,6 +30,7 @@ import java.util.List;
 
 public class NewMissionActivity extends Activity implements OnMapReadyCallback {
 
+    // 지도 정보
     GoogleMap mMap;
     UiSettings uiSettings;
 
@@ -41,6 +42,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
     EditText searchview;
     Button button1;
 
+    // 미션 정보
     ArrayList<MissionInfo> missioninfo = new ArrayList<MissionInfo>();
 
     @Override
@@ -104,23 +106,21 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
 
         Toast.makeText(getApplicationContext(), "원하는 위치를 길게 터치하시면\n새로운 힌트가 만들어집니다.", Toast.LENGTH_SHORT).show();
 
+        // 초기 위치
         LatLng SEOUL = new LatLng(37.56, 126.97);
-
         MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(SEOUL);
-//        markerOptions.title("힌트1");
-//        markerOptions.snippet("Hint1");
-//        map.addMarker(markerOptions);
-
         map.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         map.animateCamera(CameraUpdateFactory.zoomTo(10));
 
+        // 구글맵 옵션
         uiSettings = map.getUiSettings();
         uiSettings.setTiltGesturesEnabled(false);
         uiSettings.setRotateGesturesEnabled(false);
 
         mMap = map;
 
+
+        // 마커 생성
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
@@ -146,10 +146,10 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
                     Toast.makeText(getApplicationContext(), "힌트는 최대 5개까지만 만들 수 있습니다.", Toast.LENGTH_SHORT).show();
                 }
 
-
             }
         });
 
+        // 말풍선 띄우기
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -190,6 +190,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
             }
         });
 
+        // 힌트 삭제
         map.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
@@ -209,6 +210,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
         });
     }
 
+    // 미션 저장
     public void gotolist(){
         Intent intent = new Intent(this, MissionListActivity.class);
         intent.putExtra("mission", missioninfo);
@@ -224,6 +226,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
         finish();
     }
 
+    // 힌트 수정
     public void edithint(final int pos, final Marker marker){
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -253,6 +256,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
         alert.show();
     }
 
+    // 힌트 삭제
     public void deletehint(final int pos, final Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("삭제")
@@ -269,6 +273,7 @@ public class NewMissionActivity extends Activity implements OnMapReadyCallback {
         dialog.show() ;
     }
 
+    // 장소 검색
     protected void search(List<Address> addresses) {
 
         Address address = (Address) addresses.get(0);
