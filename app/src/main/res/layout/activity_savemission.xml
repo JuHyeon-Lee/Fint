@@ -20,7 +20,20 @@
             android:textColor="#edeada"
             android:textSize="20sp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/finishsave"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="완료" />
         </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -5,32 +5,41 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class SaveMissionActivity extends Activity{
 
+    ArrayList<MissionInfo> missionInfos = new ArrayList<MissionInfo>();
+    String writer;
+    String title;
+    String[] location;
+    String[] hints;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_missionlist);
-
+        setContentView(R.layout.activity_savemission);
 
         ListView listview ;
         ListViewAdapter adapter;
@@ -47,11 +56,22 @@ public class SaveMissionActivity extends Activity{
 
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
         missionwriter.setText(pref.getString("nickname", "작성자"));
+        writer = pref.getString("nickname", "작성자");
 
         missiontitle.setText(getIntent().getStringExtra("title"));
+        title = getIntent().getStringExtra("title");
+
+        Button finishsave = (Button) findViewById(R.id.finishsave);
+        finishsave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                savetodatabase();
+            }
+        });
 
     }
 
+    // 리스트뷰 어댑터
     public class ListViewAdapter extends BaseAdapter {
         // Adapter에 추가된 데이터를 저장하기 위한 ArrayList
         private ArrayList<MissionInfo>  missioninfo = (ArrayList<MissionInfo>) getIntent().getSerializableExtra("mission");
@@ -72,6 +92,8 @@ public class SaveMissionActivity extends Activity{
         public View getView(int position, View convertView, ViewGroup parent) {
             final int pos = position;
             final Context context = parent.getContext();
+
+            missionInfos = missioninfo;
 
             // "listview_item" Layout을 inflate하여 convertView 참조 획득.
             if (convertView == null) {
@@ -111,6 +133,7 @@ public class SaveMissionActivity extends Activity{
 
     }
 
+    // Geocoder를 이용한 좌표 -> 주소
     public String getLocation(double lat, double lng){
         String str = null;
         Geocoder geocoder = new Geocoder(this, Locale.KOREA);
@@ -131,4 +154,92 @@ public class SaveMissionActivity extends Activity{
         return str;
 
     }
+
+    private void savetodatabase(){
+
+        String loc[] = new String[missionInfos.size()];
+        String hint[] = new String[missionInfos.size()];
+
+        for(int i=0 ; i<missionInfos.size() ; i++){
+            MissionInfo missioninfo = missionInfos.get(i);
+
+            String latitude = String.valueOf(missioninfo.getLat());
+            String longitude = String.valueOf(missioninfo.getLon());
+
+            String location = latitude+","+longitude;
+
+            loc[i]=location;
+            hint[i]=missioninfo.getHint();
+        }
+
+        location = loc;
+        hints = hint;
+
+        insertToDatabase();
+
+    }
+
+    // DB에 회원정보 저장
+    private void insertToDatabase(){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+
+                    String link="http://leon6095.phps.kr/savemission.php";
+
+                    String data  = URLEncoder.encode("title", "UTF-8") + "=" + URLEncoder.encode(title, "UTF-8");
+                    data += "&" + URLEncoder.encode("writer", "UTF-8") + "=" + URLEncoder.encode(writer, "UTF-8");
+                    for(int i=0; i<location.length; i++){
+                        data += "&" + URLEncoder.encode("loc"+i, "UTF-8") + "=" + URLEncoder.encode(location[i], "UTF-8");
+                        data += "&" + URLEncoder.encode("hint"+i, "UTF-8") + "=" + URLEncoder.encode(hints[i], "UTF-8");
+                    }
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute();
+    }
+
 }
