@@ -36,6 +36,9 @@ public class SaveMissionActivity extends Activity{
     String[] location;
     String[] hints;
 
+    String missionID;
+    String id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,9 @@ public class SaveMissionActivity extends Activity{
 
         missiontitle.setText(getIntent().getStringExtra("title"));
         title = getIntent().getStringExtra("title");
+
+        id = pref.getString("userID","error");
+        Toast.makeText(getApplicationContext(), id, Toast.LENGTH_SHORT).show();
 
         Button finishsave = (Button) findViewById(R.id.finishsave);
         finishsave.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +197,9 @@ public class SaveMissionActivity extends Activity{
 
             @Override
             protected void onPostExecute(String s) {
-//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                missionID = s;
+                insertmissionID();
                 super.onPostExecute(s);
             }
 
@@ -208,6 +216,64 @@ public class SaveMissionActivity extends Activity{
                         data += "&" + URLEncoder.encode("loc"+i, "UTF-8") + "=" + URLEncoder.encode(location[i], "UTF-8");
                         data += "&" + URLEncoder.encode("hint"+i, "UTF-8") + "=" + URLEncoder.encode(hints[i], "UTF-8");
                     }
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute();
+    }
+
+    private void insertmissionID(){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+
+                    String link="http://leon6095.phps.kr/saveIDtoUser.php";
+
+                    String data  = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
+                    data += "&" + URLEncoder.encode("missionID", "UTF-8") + "=" + URLEncoder.encode(missionID, "UTF-8");
 
                     URL url = new URL(link);
                     URLConnection conn = url.openConnection();

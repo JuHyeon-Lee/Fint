@@ -127,11 +127,6 @@ public class SuccessActivity extends AppCompatActivity {
 
         insertToDatabase(Long.toString(userID), nickName, email);
 
-        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("userID", Long.toString(userID));
-        editor.commit();
-
     }
 
     // 프로필 요청
@@ -155,6 +150,11 @@ public class SuccessActivity extends AppCompatActivity {
                 Logger.d("UserProfile : " + userProfile);
                 userID = userProfile.getId();
                 email = userProfile.getEmail();
+
+                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("userID", Long.toString(userID));
+                editor.commit();
             }
 
             @Override
