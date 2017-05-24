@@ -40,8 +40,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     LatLng HERE;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,14 +49,14 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
 
-//        Button gotolist = (Button) findViewById(R.id.gotolist);
-//        gotolist.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                gotomap();
-//            }
-//        });
+        Button gotolist = (Button) findViewById(R.id.gotolist);
+        gotolist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                gotomap();
+            }
+        });
 
         Button newmission = (Button) findViewById(R.id.newmission);
         newmission.setOnClickListener(new View.OnClickListener() {
@@ -155,7 +153,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     // 액티비티 이동
     public void gotomap() {
-        Intent intent = new Intent(this, SaveMissionActivity.class);
+        Intent intent = new Intent(this, MissionListActivity.class);
         startActivity(intent);
     }
     public void newmission() {

@@ -32,6 +32,8 @@
 
         <activity android:name=".NewMissionActivity"></activity>
 
+        <activity android:name=".MissionListActivity"></activity>
+
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />

@@ -200,6 +200,12 @@ public class SaveMissionActivity extends Activity{
                 Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 missionID = s;
                 insertmissionID();
+
+                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("missionID", s);
+                editor.commit();
+
                 super.onPostExecute(s);
             }
 
