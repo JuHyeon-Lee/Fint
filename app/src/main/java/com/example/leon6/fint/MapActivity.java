@@ -11,7 +11,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -59,7 +58,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
 
-                gotomap();
+                gotolist();
             }
         });
 
@@ -81,10 +80,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         LatLng SEOUL = new LatLng(37.56, 126.97);
 
         MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(SEOUL);
-//        markerOptions.title("힌트1");
-//        markerOptions.snippet("Hint1");
-//        map.addMarker(markerOptions);
 
         map.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         map.animateCamera(CameraUpdateFactory.zoomTo(10));
@@ -144,9 +139,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                             finishAffinity();
                         }
-//                        moveTaskToBack(true);
-//                        finish();
-//                        Process.killProcess(Process.myPid());
                     }
                 }).setNegativeButton("아니오",
                 new DialogInterface.OnClickListener() {
@@ -160,7 +152,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     }
 
     // 액티비티 이동
-    public void gotomap() {
+    public void gotolist() {
         Intent intent = new Intent(this, MissionListActivity.class);
         startActivity(intent);
     }
@@ -274,7 +266,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             HERE = new LatLng(latitude,longitude);
 //            Toast.makeText(getApplicationContext(), latitude+"/"+longitude,Toast.LENGTH_SHORT).show();
 
-            if(startlocation==false){
+            if(!startlocation){
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(HERE));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
                 startlocation=true;

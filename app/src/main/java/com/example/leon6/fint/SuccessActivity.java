@@ -42,8 +42,6 @@ public class SuccessActivity extends AppCompatActivity {
 
     Button gotomap;
 
-    private SessionCallback callback;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +58,6 @@ public class SuccessActivity extends AppCompatActivity {
             hd.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-//                callback = new SplashActivity.SessionCallback();
-//                Session.getCurrentSession().addCallback(callback);
-//                Session.getCurrentSession().checkAndImplicitOpen();
                     gotomap();
                 }
             }, 1900);
@@ -99,9 +94,6 @@ public class SuccessActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 gotomap();
-//                callback = new SuccessActivity.SessionCallback();
-//                Session.getCurrentSession().addCallback(callback);
-//                Session.getCurrentSession().checkAndImplicitOpen();
             }
         });
 
@@ -270,21 +262,6 @@ public class SuccessActivity extends AppCompatActivity {
         task.execute(id,nickName,email);
     }
 
-    // 액티비티 전환 시 필요
-    private class SessionCallback implements ISessionCallback {
-
-        @Override
-        public void onSessionOpened() {
-            gotomap();
-        }
-
-        @Override
-        public void onSessionOpenFailed(KakaoException exception) {
-            if(exception != null) {
-                Logger.e(exception);
-            }
-        }
-    }
     public void gotomap(){
 
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
@@ -297,13 +274,13 @@ public class SuccessActivity extends AppCompatActivity {
         finish();
     }
 
-    private class pagerAdapter extends FragmentStatePagerAdapter
+    private class pagerAdapter extends FragmentStatePagerAdapter {
 
-    {
         public pagerAdapter(android.support.v4.app.FragmentManager fm)
         {
             super(fm);
         }
+
         @Override
         public android.support.v4.app.Fragment getItem(int position)
         {
