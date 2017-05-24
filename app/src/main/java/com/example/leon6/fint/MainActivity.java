@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
     }
 
     protected void redirectSignupActivity() {
-        final Intent intent = new Intent(this, SplashActivity.class);
+        final Intent intent = new Intent(this, SuccessActivity.class);
         startActivity(intent);
         finish();
     }

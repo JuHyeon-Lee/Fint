@@ -12,8 +12,8 @@ import com.kakao.util.helper.log.Logger;
 
 public class SplashActivity extends Activity {
 
-    Intent intent = new Intent(this, SuccessActivity.class);
-    private SessionCallback callback;
+//    Intent intent = new Intent(this, SuccessActivity.class);
+//    private SessionCallback callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,33 +25,34 @@ public class SplashActivity extends Activity {
         hd.postDelayed(new Runnable() {
             @Override
             public void run() {
-                callback = new SplashActivity.SessionCallback();
-                Session.getCurrentSession().addCallback(callback);
-                Session.getCurrentSession().checkAndImplicitOpen();
+//                callback = new SplashActivity.SessionCallback();
+//                Session.getCurrentSession().addCallback(callback);
+//                Session.getCurrentSession().checkAndImplicitOpen();
+                finish();
             }
         }, 2000);
 
     }
-
-    // 액티비티 전환 시 필요
-    private class SessionCallback implements ISessionCallback {
-
-        @Override
-        public void onSessionOpened() {
-            gotomap();
-        }
-
-        @Override
-        public void onSessionOpenFailed(KakaoException exception) {
-            if(exception != null) {
-                Logger.e(exception);
-            }
-        }
-    }
-    public void gotomap(){
-
-        Intent intent = new Intent(this, SuccessActivity.class);
-        startActivity(intent);
-        finish();
-    }
+//
+//    // 액티비티 전환 시 필요
+//    private class SessionCallback implements ISessionCallback {
+//
+//        @Override
+//        public void onSessionOpened() {
+//            gotomap();
+//        }
+//
+//        @Override
+//        public void onSessionOpenFailed(KakaoException exception) {
+//            if(exception != null) {
+//                Logger.e(exception);
+//            }
+//        }
+//    }
+//    public void gotomap(){
+//
+//        Intent intent = new Intent(this, SuccessActivity.class);
+//        startActivity(intent);
+//        finish();
+//    }
 }

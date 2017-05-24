@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -40,10 +41,14 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     LatLng HERE;
 
+    boolean startlocation = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        startlocation=false;
 
         FragmentManager fragmentManager = getFragmentManager();
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentById(R.id.mapView);
@@ -136,9 +141,12 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        moveTaskToBack(true);
-                        finish();
-                        android.os.Process.killProcess(android.os.Process.myPid());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            finishAffinity();
+                        }
+//                        moveTaskToBack(true);
+//                        finish();
+//                        Process.killProcess(Process.myPid());
                     }
                 }).setNegativeButton("아니오",
                 new DialogInterface.OnClickListener() {
@@ -265,8 +273,13 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
             HERE = new LatLng(latitude,longitude);
 //            Toast.makeText(getApplicationContext(), latitude+"/"+longitude,Toast.LENGTH_SHORT).show();
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(HERE));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+            if(startlocation==false){
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(HERE));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                startlocation=true;
+            }
+
         }
         public void onProviderDisabled(String provider) {
             // Disabled시

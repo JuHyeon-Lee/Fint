@@ -3,6 +3,7 @@ package com.example.leon6.fint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -48,12 +49,24 @@ public class SuccessActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_success);
 
+        Intent intent = new Intent(this, SplashActivity.class);
+        startActivity(intent);
+
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
         Boolean tut = pref.getBoolean("tutorial", false);
         if(tut==true){
-            callback = new SuccessActivity.SessionCallback();
-            Session.getCurrentSession().addCallback(callback);
-            Session.getCurrentSession().checkAndImplicitOpen();
+            Handler hd = new Handler();
+
+            hd.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+//                callback = new SplashActivity.SessionCallback();
+//                Session.getCurrentSession().addCallback(callback);
+//                Session.getCurrentSession().checkAndImplicitOpen();
+                    gotomap();
+                }
+            }, 1900);
+
         }
 
         vp = (ViewPager)findViewById(R.id.vp);
@@ -85,9 +98,10 @@ public class SuccessActivity extends AppCompatActivity {
         gotomap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback = new SuccessActivity.SessionCallback();
-                Session.getCurrentSession().addCallback(callback);
-                Session.getCurrentSession().checkAndImplicitOpen();
+                gotomap();
+//                callback = new SuccessActivity.SessionCallback();
+//                Session.getCurrentSession().addCallback(callback);
+//                Session.getCurrentSession().checkAndImplicitOpen();
             }
         });
 
