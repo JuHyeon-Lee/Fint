@@ -65,7 +65,7 @@ public class SaveMissionActivity extends Activity{
         title = getIntent().getStringExtra("title");
 
         id = pref.getString("userID","error");
-        Toast.makeText(getApplicationContext(), id, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), id, Toast.LENGTH_SHORT).show();
 
         Button finishsave = (Button) findViewById(R.id.finishsave);
         finishsave.setOnClickListener(new View.OnClickListener() {
@@ -201,10 +201,10 @@ public class SaveMissionActivity extends Activity{
                 missionID = s;
                 insertmissionID();
 
-                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putString("missionID", s);
-                editor.commit();
+//                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+//                SharedPreferences.Editor editor = pref.edit();
+//                editor.putString("missionID", s);
+//                editor.commit();
 
                 super.onPostExecute(s);
             }
@@ -269,6 +269,7 @@ public class SaveMissionActivity extends Activity{
             protected void onPostExecute(String s) {
 //                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 super.onPostExecute(s);
+                finish();
             }
 
             @Override

@@ -57,7 +57,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         gotolist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 gotolist();
             }
         });
@@ -66,7 +65,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         newmission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 newmission();
             }
         });
