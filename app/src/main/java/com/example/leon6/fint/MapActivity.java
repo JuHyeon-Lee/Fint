@@ -102,9 +102,12 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         mMap.clear();
+        missionInfos.clear();
+        TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+        nextdistance.setText("계산중");
     }
 
     // 맵 불러오기 완료
