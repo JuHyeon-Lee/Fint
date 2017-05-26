@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +28,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 
 public class MapActivity extends Activity implements OnMapReadyCallback {
 
@@ -68,6 +81,16 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 newmission();
             }
         });
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        String missionID = pref.getString("missionID",null);
+//        Toast.makeText(getApplicationContext(), missionID, Toast.LENGTH_SHORT).show();
+
 
     }
 
@@ -287,4 +310,83 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         }
     };
 
+    // 미션 정보 불러오기
+    private void getfromDatabase2(final String mission){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                jsonParsing2(s,mission);
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+
+                    String mission = (String)params[0];
+
+                    String link="http://leon6095.phps.kr/getmissiondata.php";
+
+                    String data  = URLEncoder.encode("missionID", "UTF-8") + "=" + URLEncoder.encode(mission, "UTF-8");
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute(mission);
+    }
+    private void jsonParsing2(String jsondata, String missionID) {
+
+        String writer = "";
+        String title = "";
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsondata);
+            JSONArray result = jsonObject.getJSONArray("result");
+            for(int i=0; i<result.length();i++){
+                JSONObject resultinfo = result.getJSONObject(i);
+                writer = resultinfo.getString("writer");
+                title = resultinfo.getString("title");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }

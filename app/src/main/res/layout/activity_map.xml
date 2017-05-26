@@ -19,12 +19,54 @@
         android:layout_height="wrap_content"
         android:background="#85af4b"
         android:gravity="right"
-        android:orientation="vertical">
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/playingmission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="#edeada"
+                android:text="진행중인 미션" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/nexthint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="힌트까지 거리 : "
+                    android:textColor="#edeada"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/nextdistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100m"
+                    android:textColor="#edeada"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="horizontal">
 
             <Button
@@ -34,18 +76,16 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_weight="1"
                 android:background="@drawable/plus" />
 
             <Button
                 android:id="@+id/gotolist"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_weight="1"
                 android:background="@drawable/lists" />
 
 

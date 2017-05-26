@@ -1,14 +1,18 @@
 package com.example.leon6.fint;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -31,6 +35,8 @@ public class MissionListActivity extends Activity {
 
     String userID;
 
+    int selectpos;
+
     ArrayList<MissionList> missionLists = new ArrayList<MissionList>();
 
     ListView listview;
@@ -47,13 +53,20 @@ public class MissionListActivity extends Activity {
         listview.setAdapter(adapter);
 
         Handler hd = new Handler();
-
         hd.postDelayed(new Runnable() {
             @Override
             public void run() {
                 adapter.notifyDataSetChanged();
             }
         }, 500);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectpos = position;
+                DialogView();
+            }
+        });
 
     }
 
@@ -300,5 +313,30 @@ public class MissionListActivity extends Activity {
 
     }
 
+    private void DialogView() {
+
+        final MissionList missionList = missionLists.get(selectpos);
+
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MissionListActivity.this);
+        alert_confirm.setMessage("미션을 시작하시겠습니까?").setCancelable(false).setPositiveButton("네",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("missionID", missionList.getID() );
+                        editor.commit();
+                        finish();
+                    }
+                }).setNegativeButton("아니오",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                });
+        AlertDialog alert = alert_confirm.create();
+        alert.show();
+    }
 
 }
