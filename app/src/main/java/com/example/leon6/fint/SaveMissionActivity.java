@@ -2,6 +2,7 @@ package com.example.leon6.fint;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
@@ -258,6 +259,8 @@ public class SaveMissionActivity extends Activity{
 
     private void insertmissionID(){
 
+        final Intent intent = new Intent(this, MissionListActivity.class);
+
         class InsertData extends AsyncTask<String, Void, String> {
 
             @Override
@@ -269,6 +272,7 @@ public class SaveMissionActivity extends Activity{
             protected void onPostExecute(String s) {
 //                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 super.onPostExecute(s);
+                startActivity(intent);
                 finish();
             }
 

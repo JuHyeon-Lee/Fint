@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -39,11 +41,16 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 public class MapActivity extends Activity implements OnMapReadyCallback {
 
     GoogleMap mMap;
     UiSettings uiSettings;
+
+    ArrayList<MissionInfo> missionInfos = new ArrayList<MissionInfo>();
+    String mistitle;
+    String miswriter;
 
     double longitude;
     double latitude;
@@ -91,7 +98,13 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         String missionID = pref.getString("missionID",null);
 //        Toast.makeText(getApplicationContext(), missionID, Toast.LENGTH_SHORT).show();
 
+        getfromDatabase2(missionID);
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMap.clear();
     }
 
     // 맵 불러오기 완료
@@ -293,6 +306,30 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 startlocation=true;
             }
 
+            MissionInfo missionInfo = missionInfos.get(0);
+
+            Location location1 = new Location("loc1");
+            location1.setLatitude(missionInfo.getLat());
+            location1.setLongitude(missionInfo.getLon());
+
+            Location location2 = new Location("loc2");
+            location2.setLatitude(latitude);
+            location2.setLongitude(longitude);
+
+            double distance = location1.distanceTo(location2);
+            String num = String.format("%.0f" , distance);
+
+            if(Integer.valueOf(num)>=1000){
+                int i = Integer.valueOf(num)/1000;
+                num=Integer.toString(i)+"km";
+            }
+            else{
+                num+="m";
+            }
+
+            TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+            nextdistance.setText(num);
+
         }
         public void onProviderDisabled(String provider) {
             // Disabled시
@@ -374,6 +411,8 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         String writer = "";
         String title = "";
+        String loc[] = new String[5];
+        String hint[] = new String[5];
 
         try {
             JSONObject jsonObject = new JSONObject(jsondata);
@@ -382,11 +421,51 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 JSONObject resultinfo = result.getJSONObject(i);
                 writer = resultinfo.getString("writer");
                 title = resultinfo.getString("title");
+                loc[0] = resultinfo.getString("loc0");
+                hint[0] = resultinfo.getString("hint0");
+                loc[1] = resultinfo.getString("loc1");
+                hint[1] = resultinfo.getString("hint1");
+                loc[2] = resultinfo.getString("loc2");
+                hint[2] = resultinfo.getString("hint2");
+                loc[3] = resultinfo.getString("loc3");
+                hint[3] = resultinfo.getString("hint3");
+                loc[4] = resultinfo.getString("loc4");
+                hint[4] = resultinfo.getString("hint4");
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+//        Toast.makeText(getApplicationContext(), missionID+"/"+title+"/"+writer+"/"+loc[0]+"/"+hint0+"/"+loc1+"/"+hint1+"/"+loc2+"/"+hint2+"/"+loc3+"/"+hint3+"/"+loc4+"/"+hint4, Toast.LENGTH_SHORT).show();
+
+        mistitle=title;
+        miswriter=writer;
+        for(int i=0 ; i<5 ; i++){
+
+            if(hint[i].equals(""))
+                break;
+
+            MissionInfo missionInfo = new MissionInfo();
+            String[] location = loc[i].split(",");
+            missionInfo.setLat(Double.parseDouble(location[0]));
+            missionInfo.setLon(Double.parseDouble(location[1]));
+            missionInfo.setHint(hint[i]);
+
+            LatLng latLng = new LatLng(Double.parseDouble(location[0]), Double.parseDouble(location[1]));
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("힌트"+(i+1));
+            Marker marker = mMap.addMarker(markerOptions); //마커 생성
+
+            missionInfo.setId(marker.getId());
+
+            missionInfos.add(missionInfo);
+
+        }
+
+        TextView playingmission = (TextView) findViewById(R.id.playingmission);
+        playingmission.setText(title);
 
     }
 }
