@@ -326,13 +326,14 @@ public class MissionListActivity extends Activity {
                         SharedPreferences.Editor editor = pref.edit();
                         editor.putString("missionID", missionList.getID() );
                         editor.commit();
+                        dialog.dismiss();
                         finish();
                     }
                 }).setNegativeButton("아니오",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        return;
+                        dialog.dismiss();
                     }
                 });
         AlertDialog alert = alert_confirm.create();

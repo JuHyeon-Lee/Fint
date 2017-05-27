@@ -2,6 +2,7 @@ package com.example.leon6.fint;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -58,6 +59,8 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     float accuracy;
     String provider;
 
+    boolean onoff = true;
+
     LatLng HERE;
 
     boolean startlocation = false;
@@ -97,7 +100,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
         String missionID = pref.getString("missionID",null);
 //        Toast.makeText(getApplicationContext(), missionID, Toast.LENGTH_SHORT).show();
-
+        onoff=true;
         getfromDatabase2(missionID);
     }
 
@@ -105,9 +108,15 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     protected void onStop() {
         super.onStop();
         mMap.clear();
-        missionInfos.clear();
+        onoff=false;
         TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
         nextdistance.setText("계산중");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        missionInfos.clear();
     }
 
     // 맵 불러오기 완료
@@ -309,29 +318,35 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 startlocation=true;
             }
 
-            MissionInfo missionInfo = missionInfos.get(0);
+            if(onoff){
+                MissionInfo missionInfo = missionInfos.get(0);
 
-            Location location1 = new Location("loc1");
-            location1.setLatitude(missionInfo.getLat());
-            location1.setLongitude(missionInfo.getLon());
+                Location location1 = new Location("loc1");
+                location1.setLatitude(missionInfo.getLat());
+                location1.setLongitude(missionInfo.getLon());
 
-            Location location2 = new Location("loc2");
-            location2.setLatitude(latitude);
-            location2.setLongitude(longitude);
+                Location location2 = new Location("loc2");
+                location2.setLatitude(latitude);
+                location2.setLongitude(longitude);
 
-            double distance = location1.distanceTo(location2);
-            String num = String.format("%.0f" , distance);
+                double distance = location1.distanceTo(location2);
+                String num = String.format("%.0f" , distance);
 
-            if(Integer.valueOf(num)>=1000){
-                int i = Integer.valueOf(num)/1000;
-                num=Integer.toString(i)+"km";
+                if(Integer.valueOf(num)>=1000){
+                    int i = Integer.valueOf(num)/1000;
+                    num=Integer.toString(i)+"km";
+                }
+                else{
+                    num+="m";
+                }
+
+                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+                nextdistance.setText(num);
+
+                if(distance<10){
+                    gethintdialog();
+                }
             }
-            else{
-                num+="m";
-            }
-
-            TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
-            nextdistance.setText(num);
 
         }
         public void onProviderDisabled(String provider) {
@@ -469,6 +484,24 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         TextView playingmission = (TextView) findViewById(R.id.playingmission);
         playingmission.setText(title);
+
+    }
+
+    private void gethintdialog() {
+        onoff=false;
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
+        MissionInfo missionInfo = missionInfos.get(0);
+        alert_confirm.setMessage("힌트 완료!\n"+missionInfo.getHint()).setCancelable(false)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onoff=true;
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = alert_confirm.create();
+        alert.show();
+
 
     }
 }
