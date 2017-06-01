@@ -59,11 +59,14 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     float accuracy;
     String provider;
 
-    boolean onoff = true;
+    boolean onoff = false;
+    boolean done = false;
 
     LatLng HERE;
 
     boolean startlocation = false;
+
+    int stage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +103,18 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
         String missionID = pref.getString("missionID",null);
 //        Toast.makeText(getApplicationContext(), missionID, Toast.LENGTH_SHORT).show();
-        onoff=true;
-        getfromDatabase2(missionID);
+
+        SharedPreferences.Editor editor = pref.edit();
+        stage = pref.getInt(missionID, 10);
+        if(stage==10){
+            editor.putInt(missionID, 0);
+            editor.apply();
+            stage=0;
+        }
+
+        if(missionID!=null){
+            getfromDatabase2(missionID);
+        }
     }
 
     @Override
@@ -111,6 +124,12 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         onoff=false;
         TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
         nextdistance.setText("계산중");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onoff=false;
     }
 
     @Override
@@ -319,32 +338,34 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             }
 
             if(onoff){
-                MissionInfo missionInfo = missionInfos.get(0);
+                if(stage<missionInfos.size()){
+                    MissionInfo missionInfo = missionInfos.get(stage);
 
-                Location location1 = new Location("loc1");
-                location1.setLatitude(missionInfo.getLat());
-                location1.setLongitude(missionInfo.getLon());
+                    Location location1 = new Location("loc1");
+                    location1.setLatitude(missionInfo.getLat());
+                    location1.setLongitude(missionInfo.getLon());
 
-                Location location2 = new Location("loc2");
-                location2.setLatitude(latitude);
-                location2.setLongitude(longitude);
+                    Location location2 = new Location("loc2");
+                    location2.setLatitude(latitude);
+                    location2.setLongitude(longitude);
 
-                double distance = location1.distanceTo(location2);
-                String num = String.format("%.0f" , distance);
+                    double distance = location1.distanceTo(location2);
+                    String num = String.format("%.0f" , distance);
 
-                if(Integer.valueOf(num)>=1000){
-                    int i = Integer.valueOf(num)/1000;
-                    num=Integer.toString(i)+"km";
-                }
-                else{
-                    num+="m";
-                }
+                    if(Integer.valueOf(num)>=1000){
+                        int i = Integer.valueOf(num)/1000;
+                        num=Integer.toString(i)+"km";
+                    }
+                    else{
+                        num+="m";
+                    }
 
-                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
-                nextdistance.setText(num);
+                    TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+                    nextdistance.setText(num);
 
-                if(distance<10){
-                    gethintdialog();
+                    if(distance<10){
+                        gethintdialog();
+                    }
                 }
             }
 
@@ -474,34 +495,98 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("힌트"+(i+1));
-            Marker marker = mMap.addMarker(markerOptions); //마커 생성
 
-            missionInfo.setId(marker.getId());
+//            Marker marker = mMap.addMarker(markerOptions); // 마커 생성
+//            missionInfo.setId(marker.getId());
 
-            missionInfos.add(missionInfo);
+            if(missionInfos.size()==0){
+                done=false;
+            }
+            if(!done){
+                missionInfos.add(missionInfo);
+            }
+        }
 
+        done = true;
+
+        String s = stage +" / "+missionInfos.size();
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+        if(stage >= missionInfos.size()){
+            finishmission();
+        }
+        else{
+            MissionInfo missionInfo = missionInfos.get(stage);
+            LatLng latLng = new LatLng(missionInfo.getLat(),missionInfo.getLon());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("힌트"+(stage+1));
+            mMap.addMarker(markerOptions);
         }
 
         TextView playingmission = (TextView) findViewById(R.id.playingmission);
         playingmission.setText(title);
 
+        onoff=true;
+
     }
 
     private void gethintdialog() {
         onoff=false;
+
         AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
-        MissionInfo missionInfo = missionInfos.get(0);
-        alert_confirm.setMessage("힌트 완료!\n"+missionInfo.getHint()).setCancelable(false)
+        MissionInfo missionInfo = missionInfos.get(stage);
+        alert_confirm.setMessage("힌트 완료!\n\n"+missionInfo.getHint()).setCancelable(false)
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                stage++;
+                mMap.clear();
                 onoff=true;
                 dialog.dismiss();
+
+                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                String missionID = pref.getString("missionID",null);
+
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putInt(missionID, stage);
+                editor.apply();
+
+                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+                nextdistance.setText("계산중");
+
+                getfromDatabase2(missionID);
             }
         });
         AlertDialog alert = alert_confirm.create();
         alert.show();
+    }
 
+    private void finishmission() {
+        onoff=false;
 
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
+        alert_confirm.setMessage("힌트를 모두 획득하셨습니다!").setCancelable(false)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMap.clear();
+                        onoff=true;
+                        dialog.dismiss();
+
+                        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                        String missionID = pref.getString("missionID",null);
+
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putInt(missionID, stage);
+                        editor.apply();
+
+                        TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+                        nextdistance.setText("계산중");
+
+//                        getfromDatabase2(missionID);
+                    }
+                });
+        AlertDialog alert = alert_confirm.create();
+        alert.show();
     }
 }
