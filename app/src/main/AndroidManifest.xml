@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:name=".GlobalApplication"
         android:allowBackup="true"
@@ -22,17 +27,19 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SuccessActivity"></activity>
+        <activity android:name=".SuccessActivity" />
 
-        <activity android:name=".SplashActivity"></activity>
+        <activity android:name=".SplashActivity" />
 
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".MapActivity" />
 
-        <activity android:name=".SaveMissionActivity"></activity>
+        <activity android:name=".SaveMissionActivity" />
 
-        <activity android:name=".NewMissionActivity"></activity>
+        <activity android:name=".NewMissionActivity" />
 
-        <activity android:name=".MissionListActivity"></activity>
+        <activity android:name=".MissionListActivity" />
+
+        <activity android:name=".CameraActivity" />
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"

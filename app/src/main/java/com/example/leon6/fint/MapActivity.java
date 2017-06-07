@@ -257,6 +257,12 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
                                     }
 
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                            requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+                                        }
+                                    }
+
                                 }
                             })
                             .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
@@ -275,6 +281,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 else {
                     // CALL_PHONE 권한을 Android OS 에 요청한다.
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
                 }
 
             }
@@ -533,32 +540,52 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     private void gethintdialog() {
         onoff=false;
 
-        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
+        Toast.makeText(getApplicationContext(), "힌트 발견!\n주위를 둘러보며 숨겨져있는 힌트를 찾아보세요!", Toast.LENGTH_SHORT).show();
+
         MissionInfo missionInfo = missionInfos.get(stage);
-        alert_confirm.setMessage("힌트 완료!\n\n"+missionInfo.getHint()).setCancelable(false)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                stage++;
-                mMap.clear();
-                onoff=true;
-                dialog.dismiss();
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra("hint",missionInfo.getHint());
 
-                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
-                String missionID = pref.getString("missionID",null);
+        stage++;
+        mMap.clear();
 
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putInt(missionID, stage);
-                editor.apply();
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        String missionID = pref.getString("missionID",null);
 
-                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
-                nextdistance.setText("계산중");
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(missionID, stage);
+        editor.apply();
 
-                getfromDatabase2(missionID);
-            }
-        });
-        AlertDialog alert = alert_confirm.create();
-        alert.show();
+        startActivity(intent);
+
+
+
+//        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
+//        MissionInfo missionInfo = missionInfos.get(stage);
+//        alert_confirm.setMessage("힌트 완료!\n\n"+missionInfo.getHint()).setCancelable(false)
+//                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                stage++;
+//                mMap.clear();
+//                onoff=true;
+//                dialog.dismiss();
+//
+//                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+//                String missionID = pref.getString("missionID",null);
+//
+//                SharedPreferences.Editor editor = pref.edit();
+//                editor.putInt(missionID, stage);
+//                editor.apply();
+//
+//                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
+//                nextdistance.setText("계산중");
+//
+//                getfromDatabase2(missionID);
+//            }
+//        });
+//        AlertDialog alert = alert_confirm.create();
+//        alert.show();
     }
 
     private void finishmission() {
