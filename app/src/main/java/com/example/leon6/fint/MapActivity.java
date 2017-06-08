@@ -546,7 +546,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("hint",missionInfo.getHint());
 
-        stage++;
+//        stage++;
         mMap.clear();
 
         SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
