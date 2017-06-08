@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.Random;
 
 public class CameraActivity extends Activity implements SurfaceHolder.Callback,SensorEventListener {
     @SuppressWarnings("deprecation")
@@ -51,11 +51,18 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback,S
     private SensorManager sm;
     private Sensor s;
 
+    int num1;
+    int num2;
+
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        Random rnd = new Random();
+        num1 = rnd.nextInt(340)+10;
+        num2 = rnd.nextInt(160)+10;
 
         memolayout = (FrameLayout) findViewById(R.id.memolayout);
         memolayout.bringToFront();
@@ -214,8 +221,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback,S
                     +"\n롤 : "+event.values[2];
             memo.setText(getIntent().getStringExtra("hint"));
 
-            if(event.values[0]>350||event.values[0]<10){
-                if(event.values[1]>-100&&event.values[1]<-80){
+            if( (event.values[0]>(num1-10)) || (event.values[0]<(num1+10)) ){
+                if( (event.values[1]>(num2-190)) && (event.values[1]<(num2-170)) ){
                     memolayout.setVisibility(View.VISIBLE);
                     takepicture.setVisibility(View.VISIBLE);
                 }

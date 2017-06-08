@@ -2,7 +2,6 @@ package com.example.leon6.fint;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -482,8 +480,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             e.printStackTrace();
         }
 
-//        Toast.makeText(getApplicationContext(), missionID+"/"+title+"/"+writer+"/"+loc[0]+"/"+hint0+"/"+loc1+"/"+hint1+"/"+loc2+"/"+hint2+"/"+loc3+"/"+hint3+"/"+loc4+"/"+hint4, Toast.LENGTH_SHORT).show();
-
         mistitle=title;
         miswriter=writer;
         for(int i=0 ; i<5 ; i++){
@@ -502,9 +498,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("힌트"+(i+1));
-
-//            Marker marker = mMap.addMarker(markerOptions); // 마커 생성
-//            missionInfo.setId(marker.getId());
 
             if(missionInfos.size()==0){
                 done=false;
@@ -558,34 +551,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         startActivity(intent);
 
-
-
-//        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MapActivity.this);
-//        MissionInfo missionInfo = missionInfos.get(stage);
-//        alert_confirm.setMessage("힌트 완료!\n\n"+missionInfo.getHint()).setCancelable(false)
-//                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                stage++;
-//                mMap.clear();
-//                onoff=true;
-//                dialog.dismiss();
-//
-//                SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
-//                String missionID = pref.getString("missionID",null);
-//
-//                SharedPreferences.Editor editor = pref.edit();
-//                editor.putInt(missionID, stage);
-//                editor.apply();
-//
-//                TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
-//                nextdistance.setText("계산중");
-//
-//                getfromDatabase2(missionID);
-//            }
-//        });
-//        AlertDialog alert = alert_confirm.create();
-//        alert.show();
     }
 
     private void finishmission() {
@@ -609,8 +574,6 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
                         TextView nextdistance = (TextView) findViewById(R.id.nextdistance);
                         nextdistance.setText("계산중");
-
-//                        getfromDatabase2(missionID);
                     }
                 });
         AlertDialog alert = alert_confirm.create();
