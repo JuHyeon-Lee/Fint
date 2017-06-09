@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,8 +29,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +69,8 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     boolean startlocation = false;
 
     int stage;
+
+    ArrayList<com.google.android.gms.maps.model.LatLng> roadtrack = new ArrayList<com.google.android.gms.maps.model.LatLng>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +190,30 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                     startActivity(gpsOptionsIntent);
                 }
                 return false;
+            }
+        });
+
+        //정보창 클릭 리스너
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+                LatLng startloc = HERE;
+                LatLng endloc = marker.getPosition();
+                RoadTracker roadTracker = new RoadTracker(mMap);
+                roadtrack = roadTracker.getJsonData(startloc, endloc);
+
+                LatLng basicNameValuePair = roadtrack.get(0);
+//                Toast.makeText(getApplicationContext(), Double.toString(basicNameValuePair.latitude) + " / " + Double.toString(basicNameValuePair.longitude), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), Integer.toString(roadtrack.size()), Toast.LENGTH_SHORT).show();
+
+
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.color(Color.RED);
+                polylineOptions.width(5);
+                polylineOptions.addAll(roadtrack);
+                mMap.addPolyline(polylineOptions);
+
             }
         });
     }
