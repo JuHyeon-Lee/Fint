@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -65,6 +66,15 @@ public class MissionListActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectpos = position;
                 DialogView();
+            }
+        });
+
+        listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                selectpos = position;
+                DialogView2();
+                return false;
             }
         });
 
@@ -207,8 +217,13 @@ public class MissionListActivity extends Activity {
             e.printStackTrace();
         }
 
+//        Toast.makeText(getApplicationContext(), mission[0]+"/"+mission[1]+"/"+mission[2]+"/"+mission[3]+"/"+mission[4] , Toast.LENGTH_SHORT).show();
+
         for(int i=0;i<5;i++){
-            if(mission[i].equals("null")){
+            if(mission[i]==null){
+                break;
+            }
+            else if(mission[i].equals("null")){
                 break;
             }
             else{
@@ -338,6 +353,98 @@ public class MissionListActivity extends Activity {
                 });
         AlertDialog alert = alert_confirm.create();
         alert.show();
+    }
+
+    private void DialogView2() {
+
+        final MissionList missionList = missionLists.get(selectpos);
+
+        AlertDialog.Builder alert_confirm = new AlertDialog.Builder(MissionListActivity.this);
+        alert_confirm.setMessage("미션을 삭제하시겠습니까?").setCancelable(false).setPositiveButton("네",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deletefromDatabase(missionList.getID());
+                        missionLists.remove(selectpos);
+                        adapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "삭제가 완료되었습니다." , Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton("아니오",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alert = alert_confirm.create();
+        alert.show();
+    }
+
+    private void deletefromDatabase(final String mission){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+//                getfromDatabase();
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+
+                    SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                    userID = pref.getString("userID", "error");
+
+                    String missionID = (String)params[0];
+
+                    String link="http://leon6095.phps.kr/deletemission.php";
+
+                    String data  = URLEncoder.encode("missionID", "UTF-8") + "=" + URLEncoder.encode(missionID, "UTF-8");
+                    data += "&" + URLEncoder.encode("userID", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute(mission);
     }
 
 }
