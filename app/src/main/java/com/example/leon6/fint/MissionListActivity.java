@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +17,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.kakao.kakaolink.AppActionBuilder;
+import com.kakao.kakaolink.AppActionInfoBuilder;
+import com.kakao.kakaolink.KakaoLink;
+import com.kakao.kakaolink.KakaoTalkLinkMessageBuilder;
+import com.kakao.util.KakaoParameterException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +51,9 @@ public class MissionListActivity extends Activity {
     ListView listview;
     ListViewAdapter adapter = new ListViewAdapter();
 
+    private KakaoLink kakaoLink;
+    private KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,16 +76,17 @@ public class MissionListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectpos = position;
-                DialogView();
+                Dialog_select();
             }
         });
 
-        listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        Button addmission = (Button) findViewById(R.id.addmission);
+        addmission.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                selectpos = position;
-                DialogView2();
-                return false;
+            public void onClick(View v) {
+
+                Dialog_addmission("");
+
             }
         });
 
@@ -328,6 +340,7 @@ public class MissionListActivity extends Activity {
 
     }
 
+    // 미션 시작
     private void DialogView() {
 
         final MissionList missionList = missionLists.get(selectpos);
@@ -355,6 +368,7 @@ public class MissionListActivity extends Activity {
         alert.show();
     }
 
+    // 미션 삭제
     private void DialogView2() {
 
         final MissionList missionList = missionLists.get(selectpos);
@@ -380,7 +394,6 @@ public class MissionListActivity extends Activity {
         AlertDialog alert = alert_confirm.create();
         alert.show();
     }
-
     private void deletefromDatabase(final String mission){
 
         class InsertData extends AsyncTask<String, Void, String> {
@@ -447,4 +460,197 @@ public class MissionListActivity extends Activity {
         task.execute(mission);
     }
 
+    // 미션 등록
+    private void Dialog_addmission(String missionID){
+        AlertDialog.Builder ad = new AlertDialog.Builder(this);
+
+        ad.setTitle("미션 추가");       // 제목 설정
+        ad.setMessage("추가하실 미션 ID를 입력해주세요");   // 내용 설정
+
+        // EditText 삽입하기
+        final EditText et = new EditText(this);
+        if(!missionID.equals("")){
+            et.setText(missionID);
+        }
+        ad.setView(et);
+
+        // 확인 버튼 설정
+        ad.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Text 값 받아서 로그 남기기
+                String value = et.getText().toString();
+                insertmissionID(value);
+                dialog.dismiss();     //닫기
+                // Event
+
+                missionLists.clear();
+
+                getfromDatabase();
+
+                Handler hd = new Handler();
+                hd.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                }, 500);
+
+            }
+        });
+
+        // 취소 버튼 설정
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();     //닫기
+                // Event
+            }
+        });
+
+        // 창 띄우기
+        ad.show();
+    }
+    private void insertmissionID(String mission){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+
+                    SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+                    userID = pref.getString("userID", "error");
+
+                    String missionID = (String)params[0];
+
+                    String link="http://leon6095.phps.kr/saveIDtoUser.php";
+
+                    String data  = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(userID, "UTF-8");
+                    data += "&" + URLEncoder.encode("missionID", "UTF-8") + "=" + URLEncoder.encode(missionID, "UTF-8");
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute(mission);
+    }
+
+    // 미션 클릭시 선택지
+    private void Dialog_select(){
+        final CharSequence[] items = { "시작하기", "삭제하기", "카카오톡으로 공유" };
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MissionListActivity.this);
+
+        // 제목셋팅
+        alertDialogBuilder.setTitle("선택");
+        alertDialogBuilder.setItems(items,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        if(items[id].equals("시작하기")){
+                            dialog.dismiss();
+                            DialogView();
+                        }
+                        else if(items[id].equals("삭제하기")){
+                            dialog.dismiss();
+                            DialogView2();
+                        }
+                        else if(items[id].equals("카카오톡으로 공유")){
+                            dialog.dismiss();
+                            SendtoKakao();
+//                            Toast.makeText(getApplicationContext(), "카톡", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+        // 다이얼로그 생성
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // 다이얼로그 보여주기
+        alertDialog.show();
+
+    }
+
+    private void SendtoKakao(){
+
+        try {
+            kakaoLink = KakaoLink.getKakaoLink(this);
+            kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
+        } catch (KakaoParameterException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            kakaoTalkLinkMessageBuilder.addText("미션이 도착했습니다!");
+            MissionList missionList = missionLists.get(selectpos);
+            kakaoTalkLinkMessageBuilder.addAppButton("미션 받기",
+                    new AppActionBuilder().addActionInfo(AppActionInfoBuilder.createAndroidActionInfoBuilder().setExecuteParam("execparamkey1="+missionList.getID()).build())
+                            .build());
+            kakaoTalkLinkMessageBuilder.build();
+            kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder, this);
+        } catch (KakaoParameterException e) {
+            e.getMessage();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+
+        if(uri != null)
+        {
+            String execparamkey1	=	uri.getQueryParameter("execparamkey1");
+
+            if(execparamkey1 != null)
+                Dialog_addmission(execparamkey1);
+//                Toast.makeText(getApplicationContext(), execparamkey1, Toast.LENGTH_SHORT).show();
+        }
+    }
 }
