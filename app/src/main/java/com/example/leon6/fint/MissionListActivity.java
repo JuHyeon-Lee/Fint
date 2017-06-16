@@ -330,11 +330,17 @@ public class MissionListActivity extends Activity {
             e.printStackTrace();
         }
 
-        MissionList missionList = new MissionList();
-        missionList.setID(missionID);
-        missionList.setTitle(title);
-        missionList.setWriter(writer);
-        missionLists.add(missionList);
+        if(title.equals("")){
+            Toast.makeText(getApplicationContext(), "등록되어있지 않은 미션입니다.", Toast.LENGTH_SHORT).show();
+            deletefromDatabase(missionID);
+        }
+        else{
+            MissionList missionList = new MissionList();
+            missionList.setID(missionID);
+            missionList.setTitle(title);
+            missionList.setWriter(writer);
+            missionLists.add(missionList);
+        }
 
 //        Toast.makeText(getApplicationContext(), missionID+"/"+title+"/"+writer, Toast.LENGTH_SHORT).show();
 
@@ -480,21 +486,32 @@ public class MissionListActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 // Text 값 받아서 로그 남기기
                 String value = et.getText().toString();
-                insertmissionID(value);
-                dialog.dismiss();     //닫기
-                // Event
 
-                missionLists.clear();
-
-                getfromDatabase();
-
-                Handler hd = new Handler();
-                hd.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
+                for(int i=0; i<missionLists.size();i++){
+                    MissionList missionList = missionLists.get(i);
+                    if(missionList.getID().equals(value)){
+                        Toast.makeText(getApplicationContext(), "이미 등록된 미션입니다.", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        break;
                     }
-                }, 500);
+                    else if(i==missionLists.size()-1){
+                        insertmissionID(value);
+                        dialog.dismiss();     //닫기
+                        // Event
+
+                        missionLists.clear();
+
+                        getfromDatabase();
+
+                        Handler hd = new Handler();
+                        hd.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        }, 500);
+                    }
+                }
 
             }
         });
@@ -609,6 +626,7 @@ public class MissionListActivity extends Activity {
 
     }
 
+    // 카카오톡으로 미션 전송
     private void SendtoKakao(){
 
         try {
